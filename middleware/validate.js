@@ -1,31 +1,24 @@
-const {body ,validationResult}=require('express-validator')
+module.exports = (req, res, next) => {
+const { name,email, password } = req.body;
 
-const signupValidation=[
-    body('email').isEmail().withMessage('invalid email'),
-    body('password')
-    .isLength({min:6})
-    .withMessage('password must be 6 character'),
+  if (! /^[A-Za-z ]+$/.test(name)) {
+    return res.status(400).json({ message: "Name should contain only letters"});
+  }
+  if (!email || !password) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
 
-    (req,res,next)=>{
-        const error=validationResult(req)
-        if(!error.isEmpty()){// empty allangil R
-            return res.status(400).json({error:error.array()})
-        }
-        next()
-    }
-]
+  if (!email.includes("@gmail.com")) {
+    return res.status(400).json({ message: "Invalid email format" });
+  }
 
-const loginValidation= [
-    body('email').isEmail(),
-    body('password').notEmpty(),
+  if (password.length < 8) {
+    return res.status(400).json({ message: "Password must be 8 characters" });
+  }
+  if (!/[!@#$]/.test(password)) {
+    return res.status(400).json({ message: "use specail passwrd" })
+  }
 
-    (req,res,next)=>{
-        const error=validationResult(req)
-        if(!error.isEmpty()){
-            return res.status(400).json({error:error.array()})
-        }
-        next()
-    }
-]
 
-module.exports={signupValidation,loginValidation }
+  next();
+};
